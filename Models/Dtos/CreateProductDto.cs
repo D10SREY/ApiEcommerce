@@ -17,7 +17,8 @@ public class CreateProductDto
     public decimal Price { get; set; }
 
     // Agregamos la URL de la imagen
-    public string ImageUrl { get; set; } = string.Empty;
+    public string? ImageUrl { get; set; }
+    public IFormFile? Image{get ; set;}
 
     // El SKU (Código de barras/almacén) sí suele ser obligatorio
     [Required(ErrorMessage = "El código SKU es obligatorio")]

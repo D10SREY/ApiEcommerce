@@ -1,14 +1,22 @@
+using ApiEcommerce.Const;
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
-using AutoMapper;
+using Asp.Versioning;
+using MapsterMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
 
-namespace ApiEcommerce.Controllers
+namespace ApiEcommerce.Controllers.v1
 {
-    [Route("api/[controller]")]
+
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("1.0")]
     [ApiController]
+    [Authorize( Roles = "Admin")]
+    //[EnableCors(PolicyNames.AllowSpecificOrigin)]
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryRepository _categoryRepository;
@@ -19,9 +27,14 @@ namespace ApiEcommerce.Controllers
             _categoryRepository = categoryRepository;
             _mapper = mapper;
         }
+        [AllowAnonymous]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
          [ProducesResponseType(StatusCodes.Status200OK)]
+         [Obsolete("este metodo esta obsoleto, use GetCategoriesByid de la version 2 en su lugar")]
+      
+        //[EnableCors(PolicyNames.AllowSpecificOrigin)]
+
          public IActionResult GetCategories()
         {
             var categories = _categoryRepository.GetCategories();
@@ -33,15 +46,20 @@ namespace ApiEcommerce.Controllers
             } 
             return Ok(categoriesDto);
         }
+     
+        [AllowAnonymous]
         [HttpGet ("{id:int}",Name ="GetCategory")]
-       
+        //[ResponseCache(Duration = 10)]
+        [ResponseCache(CacheProfileName = CacheProfiles.Default10)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
          [ProducesResponseType(StatusCodes.Status404NotFound)]
           [ProducesResponseType(StatusCodes.Status400BadRequest)]
          [ProducesResponseType(StatusCodes.Status200OK)]
          public IActionResult GetCategory(int id )
         {
+            System.Console.WriteLine($"Categoria con el ID : {id} a las {DateTime.Now   }");
             var category = _categoryRepository.GetCategory(id);
+            System.Console.WriteLine($"Respuesta con el ID : {id}");
             if (category == null)
             {
                 return NotFound($"La categoria con el id {id} no existe");
